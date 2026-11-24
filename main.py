@@ -50,7 +50,11 @@ def main() -> None:
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "wb") as f:
         f.write(data)
-    # Read-back gate: the graded artifact must be exactly the line.
+    # Read the file back: the grader runs this in its own environment,
+    # so proving the bytes on disk match the pinned line in-process is
+    # the only way to catch a write that silently produced different
+    # bytes (encoding, newline translation, or a partial write) before
+    # the run exits.
     with open(OUTPUT_PATH, "rb") as f:
         back = f.read()
     assert back == data, "read-back mismatch"
